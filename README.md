@@ -1,3 +1,5 @@
+# BigBlueButton™ integration for Nextcloud and integrated to a recording downloader service
+This work integrates cloud_bbb solution with a recording downloader service, that allow meeting's moderator to download the recording.
 # BigBlueButton™ integration for Nextcloud
 
 ![Static analysis](https://github.com/sualko/cloud_bbb/workflows/Static%20analysis/badge.svg)

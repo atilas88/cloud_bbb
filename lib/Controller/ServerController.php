@@ -11,6 +11,8 @@ use OCP\AppFramework\Http\DataResponse;
 
 use OCP\IRequest;
 
+use OCA\BigBlueButton\Service\RecordingReadyService;
+
 class ServerController extends Controller {
 	/** @var RoomService */
 	private $service;
@@ -23,6 +25,9 @@ class ServerController extends Controller {
 
 	/** @var string */
 	private $userId;
+	
+	/** @var RecordingReadyService */
+	private $rec_service;	
 
 	public function __construct(
 		$appName,
@@ -30,7 +35,8 @@ class ServerController extends Controller {
 		RoomService $service,
 		API $server,
 		Permission $permission,
-		$UserId
+		$UserId,
+		RecordingReadyService $rec_service
 	) {
 		parent::__construct($appName, $request);
 
@@ -38,6 +44,7 @@ class ServerController extends Controller {
 		$this->server = $server;
 		$this->permission = $permission;
 		$this->userId = $UserId;
+		$this->rec_service = $rec_service;
 	}
 
 	/**
@@ -125,6 +132,14 @@ class ServerController extends Controller {
 
 		return new DataResponse($this->server->check($url, $secret));
 	}
+	
+	public function checkRecording(?string $url, ?string $secret): DataResponse {
+		if ($url === null || empty($url) || $secret === null || empty($secret)) {
+			return new DataResponse(false);
+		}
+
+		return new DataResponse($this->rec_service->checkRecordingServer($url, $secret));
+	}	
 
 	public function version(?string $url): DataResponse {
 		if ($url === null || empty($url)) {

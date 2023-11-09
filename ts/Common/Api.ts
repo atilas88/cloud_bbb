@@ -227,6 +227,15 @@ class Api {
 
 		return response.data;
 	}
+	
+	public async checkServerRec(url: string, secret: string): Promise<'success' | 'invalid-secret' | 'invalid-config'> {
+		const response = await axios.post(this.getUrl('server/checkRecording'), {
+			url,
+			secret,
+		});
+
+		return response.data;
+	}	
 
 	public async getRoomShares(roomId: number): Promise<RoomShare[]> {
 		const response = await axios.get(this.getUrl('roomShares'), {

@@ -26,6 +26,8 @@ class Admin implements ISettings {
 		$parameters = [
 			'api.url' => $this->config->getAppValue('bbb', 'api.url'),
 			'api.secret' => $this->config->getAppValue('bbb', 'api.secret'),
+			'download.url' => $this->config->getAppValue('bbb', 'download.url'),
+			'download.secret' => $this->config->getAppValue('bbb', 'download.secret'),			
 			'app.navigation' => $this->config->getAppValue('bbb', 'app.navigation') === 'true' ? 'checked' : '',
 			'join.theme' => $this->config->getAppValue('bbb', 'join.theme') === 'true' ? 'checked' : '',
 			'app.shortener' => $this->config->getAppValue('bbb', 'app.shortener'),

@@ -18,6 +18,16 @@ script('bbb', 'restrictions');
 
             <div class="bbb-result"></div>
         </form>
+        
+        <p><?php p($l->t('Configure the recording downloader server here.')); ?></p>
+
+        <form id="download-server">
+            <input type="url" name="download.url" value="<?php p($_['download.url']); ?>" placeholder="<?php p($l->t('Download URL')); ?>" pattern="https://.*" required />
+            <input type="password" name="download.secret" value="<?php p($_['download.secret']); ?>" placeholder="<?php p($l->t('Download jwt secret')); ?>" required />
+            <input type="submit" value="<?php p($l->t('Save')); ?>" />
+
+            <div class="bbb-result"></div>
+        </form>        
 
         <p>
             <input type="checkbox" name="app.navigation" id="bbb-app-navigation" class="checkbox bbb-setting" value="1" <?php p($_['app.navigation']); ?> />

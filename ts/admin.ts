@@ -21,6 +21,16 @@ $(() => {
 
 		throw result;
 	}
+	
+	async function checkServerRecording(url: string, secret: string) {
+		const result = await api.checkServerRec(url, secret);
+
+		if (result === 'success') {
+			return;
+		}
+
+		throw result;
+	}	
 
 	function checkPasswordConfirmation() {
 		return new Promise<void>(resolve => {
@@ -43,6 +53,43 @@ $(() => {
 		OCP.AppConfig.setValue('bbb', 'api.url', url);
 		OCP.AppConfig.setValue('bbb', 'api.secret', secret);
 	}
+	
+	async function saveDownloaderSettings(url: string, secret: string) {
+		url += url.endsWith('/') ? '' : '/';
+
+		await checkServerRecording(url, secret);
+
+		OCP.AppConfig.setValue('bbb', 'download.url', url);
+		OCP.AppConfig.setValue('bbb', 'download.secret', secret);
+	}
+
+	$('#download-server').on('submit', function (ev) {
+		ev.preventDefault();
+
+		const resultElement = $(this).find('.bbb-result').empty();
+
+		saveDownloaderSettings(this['download.url'].value, this['download.secret'].value).then(() => {
+			const successElement = generateSuccessElement(t('bbb', 'Settings saved'));
+
+			setTimeout(() => {
+				resultElement.empty();
+			}, 3000);
+
+			resultElement.append(successElement);
+		}).catch(err => {
+			let message = t('bbb', 'Unexpected error occurred');
+
+			if (err === 'invalid-config') {
+				message = t('bbb', 'Check the configuration');
+			} else if (err === 'invalid-secret') {
+				message = t('bbb', 'API secret is invalid');
+			}
+
+			const warningElement = generateWarningElement(message);
+
+			resultElement.append(warningElement);
+		});
+	});	
 
 	$('#bbb-api').on('submit', function (ev) {
 		ev.preventDefault();

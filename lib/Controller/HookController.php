@@ -11,6 +11,8 @@ use OCP\AppFramework\Controller;
 use OCP\EventDispatcher\IEventDispatcher;
 use OCP\IRequest;
 
+use OCA\BigBlueButton\Service\RecordingReadyService;
+
 class HookController extends Controller {
 	/** @var string */
 	protected $token;
@@ -26,19 +28,24 @@ class HookController extends Controller {
 
 	/** @var IEventDispatcher */
 	private $eventDispatcher;
+	
+	/** @var RecordingReadyService */
+	private $rec_service;	
 
 	public function __construct(
 		string $appName,
 		IRequest $request,
 		RoomService $service,
 		AvatarRepository $avatarRepository,
-		IEventDispatcher $eventDispatcher
+		IEventDispatcher $eventDispatcher,
+		RecordingReadyService $rec_service
 	) {
 		parent::__construct($appName, $request);
 
 		$this->service = $service;
 		$this->avatarRepository = $avatarRepository;
 		$this->eventDispatcher = $eventDispatcher;
+		$this->rec_service = $rec_service;
 	}
 
 	public function setToken(string $token): void {
@@ -78,7 +85,12 @@ class HookController extends Controller {
 	 * @return void
 	 */
 	public function recordingReady(): void {
+		//get params from bbb callback
+		$recording_params = $this->request->post['signed_parameters'];
+		
 		$this->eventDispatcher->dispatch(RecordingReadyEvent::class, new RecordingReadyEvent($this->getRoom()));
+		//execute download when recording is ready
+		$this->rec_service->downloadRecording($recording_params);		
 	}
 
 	private function getRoom(): ?Room {

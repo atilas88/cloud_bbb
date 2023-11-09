@@ -12,6 +12,7 @@ return [
 		['name' => 'server#insertDocument', 'url' => '/server/{roomUid}/insertDocument', 'verb' => 'POST'],
 		['name' => 'server#records', 'url' => '/server/{roomUid}/records', 'verb' => 'GET'],
 		['name' => 'server#check', 'url' => '/server/check', 'verb' => 'POST'],
+		['name' => 'server#checkRecording', 'url' => '/server/checkRecording', 'verb' => 'POST'],
 		['name' => 'server#version', 'url' => '/server/version', 'verb' => 'GET'],
 		['name' => 'server#delete_record', 'url' => '/server/record/{recordId}', 'verb' => 'DELETE'],
 		['name' => 'join#index', 'url' => '/b/{token}/{moderatorToken}', 'verb' => 'GET', 'defaults' => ['moderatorToken' => '']],
