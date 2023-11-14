@@ -82,7 +82,7 @@ class RecordingReadyService {
 
         $exec_req = $this->executeRequest($url,$secret);
 
-        if($exec_req["ret_val"] === 0 && json_decode($exec_req["output"][0]) === "Hello Avangenio")
+        if($exec_req["ret_val"] === 0 && json_decode($exec_req["output"][0]) === "Hello")
         {
             return "success";
         }
