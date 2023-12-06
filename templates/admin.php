@@ -27,7 +27,16 @@ script('bbb', 'restrictions');
             <input type="submit" value="<?php p($l->t('Save')); ?>" />
 
             <div class="bbb-result"></div>
-        </form>        
+        </form>
+
+        <p><?php p($l->t('Configure the recording expired time in days. 0 value will disable this feature')); ?></p>
+
+        <form id="expired-time">
+            <input type="text" name="expired.recording" value="<?php p($_['expired.recording']); ?>" placeholder="<?php p($l->t('Recording expired time')); ?>" pattern="[0-9]*" required />
+            <input type="submit" value="<?php p($l->t('Save')); ?>" />
+
+            <div class="bbb-result"></div>
+        </form>
 
         <p>
             <input type="checkbox" name="app.navigation" id="bbb-app-navigation" class="checkbox bbb-setting" value="1" <?php p($_['app.navigation']); ?> />

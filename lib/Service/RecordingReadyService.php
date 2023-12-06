@@ -9,21 +9,21 @@ use OCP\IConfig;
 use Psr\Log\LoggerInterface;
 
 class RecordingReadyService {
-	/** @var RoomService */
-	private $room_service;
-	/** @var API */
-	private $server;
-	/** @var IUserManager */
-	private $userManager;
+    /** @var RoomService */
+    private $room_service;
+    /** @var API */
+    private $server;
+    /** @var IUserManager */
+    private $userManager;
     /** @var IConfig */
-	private $config;
+    private $config;
     /** @var LoggerInterface */
-	private $logger;         
+    private $logger;
 
-	public function __construct(
-		RoomService $room_service,
-		API $server,
-		IUserManager $userManager,
+    public function __construct(
+        RoomService $room_service,
+        API $server,
+        IUserManager $userManager,
         IConfig $config,
         LoggerInterface $logger) {
         $this->room_service = $room_service;
@@ -31,35 +31,43 @@ class RecordingReadyService {
         $this->userManager = $userManager;
         $this->config = $config;
         $this->logger = $logger;
-	}
-    public function downloadRecording($params)
+    }
+    public function downloadRecording($params,$moderator_mail ="")
     {
-		//decode jwt to get meeting_id and record_id
+        //decode jwt to get meeting_id and record_id
         $decoded = json_decode(base64_decode(explode(".",$params)[1]),true);
-        
-		$meeting_id = $decoded["meeting_id"];
+
+        $meeting_id = $decoded["meeting_id"];
         $record_id = $decoded["record_id"];
 
-        $recordingready = $this->server->getRecording($record_id);        
+        $recordingready = $this->server->getRecording($record_id);
 
-		$recording_url = $recordingready["url"];
+        $recording_url = $recordingready["url"];
         //$recording_int_id = $recordingready["id"];
         $recording_name = $recordingready["name"];
-        $coded_name = str_replace(" ","%20",$recording_name);        
+        if(str_contains($recording_name,"."))
+        {
+            $recording_name = str_replace(".","_",$recording_name);
+        }
+        $coded_name = str_replace(" ","_",$recording_name);
+        $user_email = $moderator_mail;
+        if(empty($user_email))
+        {
+            $room = $this->room_service->findByUid($meeting_id);
+            $user_id = $room->getUserId();
 
-        $room = $this->room_service->findByUid($meeting_id);
-        $user_id = $room->getUserId();
-		
-		$user_email = $this->userManager->get($user_id)->getEMailAddress();
+            $user_email = $this->userManager->get($user_id)->getEMailAddress();
+        }
+
 
         $download_server = $this->config->getAppValue('bbb', 'download.url');
-        $bearer_token = $this->config->getAppValue('bbb', 'download.secret'); 
+        $bearer_token = $this->config->getAppValue('bbb', 'download.secret');
 
         if(!empty($user_email) && !empty($download_server) && !empty($bearer_token))
         {
-            
+
             $download_url = $download_server."video/".$recording_url.":".$coded_name."/".$user_email;
-            //Do curl resquet     
+            //Do curl resquet
             $exec_req = $this->executeRequest($download_url,$bearer_token);
             if($exec_req["ret_val"] === 0)
             {
@@ -69,14 +77,14 @@ class RecordingReadyService {
             {
                 $this->logger->error("Failed to download recording",['user_email' => $user_email, 'url' => $download_url]);
             }
-            //Do curl resquest  
+            //Do curl resquest
         }
         else
         {
             $this->logger->error("Cannot download the recording, missing configuration");
         }
-		
-      
+
+
     }
     public function checkRecordingServer(string $url, string $secret):string{
 
@@ -98,12 +106,12 @@ class RecordingReadyService {
     private function executeRequest(string $url, string $token):array{
         $curl_cmd = "curl $url -H \"Authorization: Bearer $token\"";
         $out_put = null;
-        $ret_val = null;           
+        $ret_val = null;
         exec($curl_cmd,$out_put,$ret_val);
         $result = array();
         $result["ret_val"] = $ret_val;
         $result["output"] = $out_put;
         return $result;
-    }    
+    }
 
 }

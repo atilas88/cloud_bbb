@@ -63,6 +63,12 @@ $(() => {
 		OCP.AppConfig.setValue('bbb', 'download.secret', secret);
 	}
 
+	async function saveExpiredSettings(time: number) {
+
+		OCP.AppConfig.setValue('bbb', 'expired.recording', time);
+
+	}
+
 	$('#download-server').on('submit', function (ev) {
 		ev.preventDefault();
 
@@ -89,7 +95,29 @@ $(() => {
 
 			resultElement.append(warningElement);
 		});
-	});	
+	});
+
+	$('#expired-time').on('submit', function (ev) {
+		ev.preventDefault();
+
+		const resultElement = $(this).find('.bbb-result').empty();
+
+		saveExpiredSettings(this['expired.recording'].value).then(() => {
+			const successElement = generateSuccessElement(t('bbb', 'Settings saved'));
+
+			setTimeout(() => {
+				resultElement.empty();
+			}, 3000);
+
+			resultElement.append(successElement);
+		}).catch(err => {
+			let message = t('bbb', 'Unexpected error occurred');
+
+			const warningElement = generateWarningElement(message);
+
+			resultElement.append(warningElement);
+		});
+	});
 
 	$('#bbb-api').on('submit', function (ev) {
 		ev.preventDefault();

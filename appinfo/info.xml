@@ -60,4 +60,7 @@ Developer wanted! If you have time it would be awesome if you could help to enha
             <provider>OCA\BigBlueButton\Activity\Provider</provider>
         </providers>
     </activity>
+    <background-jobs>
+        <job>OCA\BigBlueButton\BackgroundJob\CheckExpiredRecording</job>
+    </background-jobs>
 </info>
