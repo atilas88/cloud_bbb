@@ -31,9 +31,10 @@ const NewRoomForm: React.FC<Props> = (props) => {
 				disabled={processing}
 				value={name}
 				placeholder={t('bbb', 'Room name')}
-				onChange={(event) => { setName(event.target.value); }}
+				onChange={(event) => { setName(event.target.value); }}				
 				pattern="[a-zA-Z0-9\s]+"
 				title={t('bbb', 'Invalid name only letters and numbers are allowed')}
+				
 			/>
 
 			<input type="submit" disabled={processing} value={t('bbb', 'Create')} />

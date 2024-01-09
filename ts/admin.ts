@@ -21,7 +21,7 @@ $(() => {
 
 		throw result;
 	}
-	
+
 	async function checkServerRecording(url: string, secret: string) {
 		const result = await api.checkServerRec(url, secret);
 
@@ -30,7 +30,7 @@ $(() => {
 		}
 
 		throw result;
-	}	
+	}
 
 	function checkPasswordConfirmation() {
 		return new Promise<void>(resolve => {
@@ -63,7 +63,7 @@ $(() => {
 		OCP.AppConfig.setValue('bbb', 'download.secret', secret);
 	}
 
-	async function saveExpiredSettings(time: number) {
+	async function saveExpriredSettings(time: number) {
 
 		OCP.AppConfig.setValue('bbb', 'expired.recording', time);
 
@@ -102,7 +102,7 @@ $(() => {
 
 		const resultElement = $(this).find('.bbb-result').empty();
 
-		saveExpiredSettings(this['expired.recording'].value).then(() => {
+		saveExpriredSettings(this['expired.recording'].value).then(() => {
 			const successElement = generateSuccessElement(t('bbb', 'Settings saved'));
 
 			setTimeout(() => {
@@ -118,7 +118,7 @@ $(() => {
 			resultElement.append(warningElement);
 		});
 	});
-
+	
 	$('#bbb-api').on('submit', function (ev) {
 		ev.preventDefault();
 

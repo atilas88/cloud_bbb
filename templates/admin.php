@@ -18,7 +18,8 @@ script('bbb', 'restrictions');
 
             <div class="bbb-result"></div>
         </form>
-        
+
+        <!--debug -->
         <p><?php p($l->t('Configure the recording downloader server here.')); ?></p>
 
         <form id="download-server">
@@ -37,6 +38,7 @@ script('bbb', 'restrictions');
 
             <div class="bbb-result"></div>
         </form>
+        <!--debug -->        
 
         <p>
             <input type="checkbox" name="app.navigation" id="bbb-app-navigation" class="checkbox bbb-setting" value="1" <?php p($_['app.navigation']); ?> />
