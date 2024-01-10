@@ -2,6 +2,7 @@
 namespace OCA\BigBlueButton\Service;
 
 use OCA\BigBlueButton\Service\RoomService;
+use OCA\BigBlueButton\Service\UserAuthService;
 use OCA\BigBlueButton\BigBlueButton\API;
 use OCP\IUserManager;
 use OCP\IConfig;
@@ -9,6 +10,11 @@ use OCP\IConfig;
 use Psr\Log\LoggerInterface;
 
 class RecordingReadyService {
+    /**
+     * @var UserAuthService
+     */
+    private UserAuthService $userAuthService;
+
     /** @var RoomService */
     private $room_service;
     /** @var API */
@@ -21,11 +27,14 @@ class RecordingReadyService {
     private $logger;
 
     public function __construct(
+        UserAuthService $userAuthService,
         RoomService $room_service,
         API $server,
         IUserManager $userManager,
         IConfig $config,
-        LoggerInterface $logger) {
+        LoggerInterface $logger
+    ) {
+        $this->userAuthService = $userAuthService;
         $this->room_service = $room_service;
         $this->server = $server;
         $this->userManager = $userManager;
@@ -103,8 +112,24 @@ class RecordingReadyService {
             return "invalid-config";
         }
     }
-    private function executeRequest(string $url, string $token):array{
-        $curl_cmd = "curl $url -H \"Authorization: Bearer $token\"";
+
+    /**
+     * @param string $url
+     * @param string $token
+     * @return array
+     */
+    private function executeRequest(string $url, string $token): array {
+        # get encrypt credentials...
+        try {
+            $x_bearer_json = $this->userAuthService->getEncryptedUserCredentials();
+        }
+        catch (\Exception $e) {
+            $x_bearer_json = null;
+            $this->logger->error($e->getMessage());
+        }
+
+        $curl_cmd = "curl $url -H \"Authorization: Bearer $token\" -H \"X-Bearer: $x_bearer_json\"";
+
         $out_put = null;
         $ret_val = null;
         exec($curl_cmd,$out_put,$ret_val);

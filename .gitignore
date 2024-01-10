@@ -10,3 +10,7 @@ node_modules/
 .phpunit.result.cache
 .vscode/settings.json
 .php-cs-fixer.cache
+
+/lib/Resources/rsa/
+
+composer.phar
