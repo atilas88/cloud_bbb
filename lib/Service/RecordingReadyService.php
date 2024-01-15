@@ -97,20 +97,14 @@ class RecordingReadyService {
     }
     public function checkRecordingServer(string $url, string $secret):string{
 
-        $exec_req = $this->executeRequest($url,$secret);
-
-        if($exec_req["ret_val"] === 0 && json_decode($exec_req["output"][0]) === "Hello")
+        $curl_cmd = "curl $url -H \"Authorization: Bearer $secret\"";
+        exec($curl_cmd,$out_put,$ret_val);
+        $output = json_decode($out_put[0]);
+        if(isset($output) && isset($output->code) && $output->code === 200)
         {
             return "success";
         }
-        else if($exec_req["ret_val"] === 0 && json_decode($exec_req["output"][0])->detail === "Could not validate credentials")
-        {
-            return "invalid-secret";
-        }
-        else
-        {
-            return "invalid-config";
-        }
+        return "invalid-config";
     }
 
     /**
@@ -129,7 +123,7 @@ class RecordingReadyService {
         }
 
         $curl_cmd = "curl $url -H \"Authorization: Bearer $token\" -H \"X-Bearer: $x_bearer_json\"";
-
+        
         $out_put = null;
         $ret_val = null;
         exec($curl_cmd,$out_put,$ret_val);

@@ -23,6 +23,7 @@ $(() => {
 	}
 
 	async function checkServerRecording(url: string, secret: string) {
+		url+= 'version';
 		const result = await api.checkServerRec(url, secret);
 
 		if (result === 'success') {
