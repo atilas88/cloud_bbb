@@ -60,24 +60,23 @@ class RecordingReadyService {
         }
         $coded_name = str_replace(" ","_",$recording_name);
         $user_email = $moderator_mail;
-        if(empty($user_email))
-        {
-            $room = $this->room_service->findByUid($meeting_id);
-            $user_id = $room->getUserId();
 
-            $user_email = $this->userManager->get($user_id)->getEMailAddress();
-        }
+        $room = $this->room_service->findByUid($meeting_id);
+        $user_id = $room->getUserId();
+        $user = $this->userManager->get($user_id);
 
+        $user_email = empty($user_email) ?? $user->getEMailAddress();
+        $username = $user->getUID();
 
         $download_server = $this->config->getAppValue('bbb', 'download.url');
         $bearer_token = $this->config->getAppValue('bbb', 'download.secret');
 
-        if(!empty($user_email) && !empty($download_server) && !empty($bearer_token))
+        if(!empty($username) && !empty($user_email) && !empty($download_server) && !empty($bearer_token))
         {
 
             $download_url = $download_server."video/".$recording_url.":".$coded_name."/".$user_email;
             //Do curl resquet
-            $exec_req = $this->executeRequest($download_url,$bearer_token);
+            $exec_req = $this->executeRequest($download_url, $bearer_token, $username);
             if($exec_req["ret_val"] === 0)
             {
                 $this->logger->info("Executed download successfully",['user_email' => $user_email, 'url' => $download_url]);
@@ -110,12 +109,13 @@ class RecordingReadyService {
     /**
      * @param string $url
      * @param string $token
+     * @param string $username
      * @return array
      */
-    private function executeRequest(string $url, string $token): array {
+    private function executeRequest(string $url, string $token, string $username): array {
         # get encrypt credentials...
         try {
-            $x_bearer_json = $this->userAuthService->getEncryptedUserCredentials();
+            $x_bearer_json = $this->userAuthService->getEncryptedUserCredentials($username);
         }
         catch (\Exception $e) {
             $x_bearer_json = null;
