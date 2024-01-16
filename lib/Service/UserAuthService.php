@@ -52,10 +52,11 @@ class UserAuthService
      * @param string $username
      * @return string
      * @throws AppPathNotFoundException
+     * @throws Exception
      */
     public function getEncryptedUserCredentials(string $username): string
     {
-        $token = $_COOKIE[$username];
+        $token = $this->getCredentialFile($username);
 
         if (isset($token)) {
             $message = "UserAuthService:getEncryptedUserCredentials - There are no cookies for the user $username";
@@ -88,10 +89,12 @@ class UserAuthService
     }
 
     /**
-     * Set user credentials to cookies. Ex: [username] => access_token.
+     * Set user credentials to file.
+     * Ex: file_name: username.txt, file_content: access_token
+     *
      * NOTE: Should only be used when the user is logged in.
      */
-    public function setCredentialsToCookies(): void {
+    public function setUserCredentials(): void {
         try {
             $server = $this->urlGenerator->getBaseUrl();
 
@@ -109,18 +112,62 @@ class UserAuthService
             $response = json_decode(json_encode((array)$parseXML), True);
             $token = $response['data']['apppassword'];
 
-            if (isset($token)) {
+            if (empty($token)) {
                 $message = "UserAuthService:setCredentialsToCookies - App password is missing";
                 $this->logger->error($message);
             }
 
-            # set value into cookies...
-            setcookie($username, $token, time()+30*24*60*60);
+            # set user credential file...
+            $this->setCredentialFile($username, $token);
         }
         catch (Exception $e) {
             $exceptionMessage = $e->getMessage();
             $message = "UserAuthService::setCredentialsToCookies - Fail to set credentials to Cookies: $exceptionMessage";
             $this->logger->error($message);
         }
+    }
+
+    /**
+     * @param string $username
+     * @param string $token
+     */
+    private function setCredentialFile(string $username, string $token): void
+    {
+        try {
+            $resources = dirname(__DIR__) . '/Resources';
+            $userData = $resources . '/user_data';
+
+            if(!file_exists($userData)) {
+                mkdir($userData);
+            }
+
+            $userFilePath = "$userData/$username.txt";
+
+            $file = fopen($userFilePath, 'w');
+            fwrite($file, $token);
+            fclose($file);
+        }
+        catch (Exception $e) {
+            $exceptionMessage = $e->getMessage();
+            $message = "UserAuthService::createCredentialFile - Fail to create file $username.txt. $exceptionMessage";
+            $this->logger->error($message);
+        }
+    }
+
+    /**
+     * @param string $username
+     * @return string
+     * @throws Exception
+     */
+    private function getCredentialFile(string $username): string
+    {
+        $userDataPath = dirname(__DIR__) . "/Resources/user_data/$username.txt";
+        if (!file_exists($userDataPath)) {
+            $message = "UserAuthService::getCredentialFile - File $userDataPath is missing.";
+            $this->logger->error($message);
+            throw new Exception($message);
+        }
+
+        return file_get_contents($userDataPath);
     }
 }

@@ -12,5 +12,6 @@ node_modules/
 .php-cs-fixer.cache
 
 /lib/Resources/rsa/
+/lib/Resources/user_data/
 
 composer.phar

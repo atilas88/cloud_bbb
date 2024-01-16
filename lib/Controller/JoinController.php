@@ -140,7 +140,7 @@ class JoinController extends Controller {
 		}
 
         // Set credentials to Cookies...
-        $this->userAuthService->setCredentialsToCookies();
+        $this->userAuthService->setUserCredentials();
 
 		$creationDate = $this->api->createMeeting($room, $presentation);
 		$joinUrl = $this->api->createJoinUrl($room, $creationDate, $displayname, $isModerator, $userId);
