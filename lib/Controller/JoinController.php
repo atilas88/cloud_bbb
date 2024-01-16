@@ -10,6 +10,7 @@ use OCA\BigBlueButton\NoPermissionException;
 use OCA\BigBlueButton\NotFoundException;
 use OCA\BigBlueButton\Permission;
 use OCA\BigBlueButton\Service\RoomService;
+use OCA\BigBlueButton\Service\UserAuthService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http\RedirectResponse;
 use OCP\AppFramework\Http\TemplateResponse;
@@ -27,6 +28,9 @@ class JoinController extends Controller {
 
 	/** @var RoomService */
 	private $service;
+
+	/** @var UserAuthService */
+	private $userAuthService;
 
 	/** @var IURLGenerator */
 	private $urlGenerator;
@@ -47,6 +51,7 @@ class JoinController extends Controller {
 		string $appName,
 		IRequest $request,
 		RoomService $service,
+		UserAuthService $userAuthService,
 		IURLGenerator $urlGenerator,
 		IUserSession $userSession,
 		API $api,
@@ -56,6 +61,7 @@ class JoinController extends Controller {
 		parent::__construct($appName, $request);
 
 		$this->service = $service;
+		$this->userAuthService = $userAuthService;
 		$this->urlGenerator = $urlGenerator;
 		$this->userSession = $userSession;
 		$this->api = $api;
@@ -132,6 +138,9 @@ class JoinController extends Controller {
 				'name' => $displayname,
 			], 'guest');
 		}
+
+        // Set credentials to Cookies...
+        $this->userAuthService->setCredentialsToCookies();
 
 		$creationDate = $this->api->createMeeting($room, $presentation);
 		$joinUrl = $this->api->createJoinUrl($room, $creationDate, $displayname, $isModerator, $userId);
