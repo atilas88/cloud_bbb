@@ -58,15 +58,12 @@ class UserAuthService
     {
         $token = $this->getCredentialFile($username);
 
-        if (isset($token)) {
-            $message = "UserAuthService:getEncryptedUserCredentials - There are no cookies for the user $username";
+        if (empty($token)) {
+            $message = "UserAuthService:getEncryptedUserCredentials - Credential missing for user $username";
             $this->logger->error($message);
         }
 
         $userCredentials = json_encode(["user" => $username, "token" => $token], JSON_UNESCAPED_SLASHES);
-
-        # clear user cookies.
-        setcookie($username, "", time() - 3600);
 
         return $this->encryptMessage($userCredentials);
     }
@@ -113,7 +110,7 @@ class UserAuthService
             $token = $response['data']['apppassword'];
 
             if (empty($token)) {
-                $message = "UserAuthService:setCredentialsToCookies - App password is missing";
+                $message = "UserAuthService:setUserCredentials - App password is missing";
                 $this->logger->error($message);
             }
 
@@ -122,7 +119,7 @@ class UserAuthService
         }
         catch (Exception $e) {
             $exceptionMessage = $e->getMessage();
-            $message = "UserAuthService::setCredentialsToCookies - Fail to set credentials to Cookies: $exceptionMessage";
+            $message = "UserAuthService::setUserCredentials - Fail to set user credentials: $exceptionMessage";
             $this->logger->error($message);
         }
     }
@@ -143,9 +140,7 @@ class UserAuthService
 
             $userFilePath = "$userData/$username.txt";
 
-            $file = fopen($userFilePath, 'w');
-            fwrite($file, $token);
-            fclose($file);
+            file_put_contents($userFilePath, $token);
         }
         catch (Exception $e) {
             $exceptionMessage = $e->getMessage();
