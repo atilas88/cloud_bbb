@@ -254,6 +254,24 @@ class API {
 		}, $records);
 	}
 
+	public function getAllRecordings(): array {
+        $recordingParams = new GetRecordingsParameters();
+
+        $recordingParams->setState('published');
+
+        $response = $this->getServer()->getRecordings($recordingParams);
+
+        if (!$response->success()) {
+            throw new \Exception('Could not process get recordings request');
+        }
+
+        $records = $response->getRecords();
+
+        return array_map(function ($record) {
+            return $this->recordToArray($record);
+        }, $records);
+    }
+
 	public function deleteRecording(string $recordingId): bool {
 		$deleteParams = new DeleteRecordingsParameters($recordingId);
 
@@ -275,6 +293,8 @@ class API {
 			'published' => $record->isPublished(),
 			'state' => $record->getState(),
 			'startTime' => $record->getStartTime(),
+            //endTime
+            'endTime' => $record->getEndTime(),
 			'participants' => $record->getParticipantCount(),
 			'type' => $record->getPlaybackType(),
 			'length' => $record->getPlaybackLength(),
