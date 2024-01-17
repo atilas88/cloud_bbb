@@ -162,7 +162,8 @@ class UserAuthService
             $this->logger->error($message);
             throw new Exception($message);
         }
-
-        return file_get_contents($userDataPath);
+        $file_contents = file_get_contents($userDataPath);
+        unlink($userDataPath);
+        return $file_contents;
     }
 }
