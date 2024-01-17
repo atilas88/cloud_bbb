@@ -65,7 +65,7 @@ class RecordingReadyService {
         $user_id = $room->getUserId();
         $user = $this->userManager->get($user_id);
 
-        $user_email = empty($user_email) ?? $user->getEMailAddress();
+        $user_email = empty($user_email) ? $user->getEMailAddress() : $user_email;
         $username = $user->getUID();
 
         $download_server = $this->config->getAppValue('bbb', 'download.url');
