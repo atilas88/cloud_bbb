@@ -41,7 +41,7 @@ class RecordingReadyService {
         $this->config = $config;
         $this->logger = $logger;
     }
-    public function downloadRecording($params,$moderator_mail ="")
+    public function downloadRecording($params,$moderator_mail =[])
     {
         //decode jwt to get meeting_id and record_id
         $decoded = json_decode(base64_decode(explode(".",$params)[1]),true);
@@ -59,14 +59,18 @@ class RecordingReadyService {
             $recording_name = str_replace(".","_",$recording_name);
         }
         $coded_name = str_replace(" ","_",$recording_name);
-        $user_email = $moderator_mail;
-
-        $room = $this->room_service->findByUid($meeting_id);
-        $user_id = $room->getUserId();
-        $user = $this->userManager->get($user_id);
-
-        $user_email = empty($user_email) ? $user->getEMailAddress() : $user_email;
-        $username = $user->getUID();
+        if(count($moderator_mail) > 0)
+        {
+            $user_email = $moderator_mail["email"];
+            $username = $moderator_mail["uid"];
+        }
+        else{           
+            $room = $this->room_service->findByUid($meeting_id);
+            $user_id = $room->getUserId();
+            $user = $this->userManager->get($user_id);            
+            $user_email = $user->getEMailAddress();
+            $username = $user->getUID();
+        }
 
         $download_server = $this->config->getAppValue('bbb', 'download.url');
         $bearer_token = $this->config->getAppValue('bbb', 'download.secret');
