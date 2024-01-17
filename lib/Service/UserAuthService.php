@@ -96,7 +96,7 @@ class UserAuthService
             $server = $this->urlGenerator->getBaseUrl();
 
             $userCredentials = $this->store->getLoginCredentials();
-            $username = $userCredentials->getUID();
+            $username = $userCredentials->getLoginName();
             $password = $userCredentials->getPassword();
 
             $url = "$server/ocs/v2.php/core/getapppassword";
@@ -115,7 +115,7 @@ class UserAuthService
             }
 
             # set user credential file...
-            $this->setCredentialFile($username, $token);
+            $this->setCredentialFile($userCredentials->getUID(), $token);
         }
         catch (Exception $e) {
             $exceptionMessage = $e->getMessage();
